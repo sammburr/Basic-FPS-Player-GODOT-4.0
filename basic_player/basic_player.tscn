@@ -8,11 +8,6 @@
 
 [node name="Basic Player" type="CharacterBody3D"]
 script = ExtResource("1_qq6iv")
-KEY_BIND_UP = "forward"
-KEY_BIND_LEFT = "left"
-KEY_BIND_RIGHT = "right"
-KEY_BIND_DOWN = "backward"
-KEY_BIND_JUMP = "jump"
 
 [node name="Mesh" type="MeshInstance3D" parent="."]
 mesh = SubResource("CapsuleMesh_crila")
