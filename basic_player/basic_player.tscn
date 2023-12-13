@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://bwwhl6hftkw7t"]
+
+[ext_resource type="Script" path="res://basic_player.gd" id="1_qq6iv"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_crila"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1rru0"]
+
+[node name="Basic Player" type="CharacterBody3D"]
+script = ExtResource("1_qq6iv")
+KEY_BIND_UP = "forward"
+KEY_BIND_LEFT = "left"
+KEY_BIND_RIGHT = "right"
+KEY_BIND_DOWN = "backward"
+KEY_BIND_JUMP = "jump"
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_crila")
+
+[node name="Collider" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_1rru0")
+
+[node name="Head" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.637357, 0)
+
+[node name="Player Camera" type="Camera3D" parent="Head"]
