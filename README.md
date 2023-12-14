@@ -5,6 +5,8 @@
 Download the project `.zip` and extract the folder `basic_player/`, simply drag and drop the folder into your project.
 **!** Make sure the `.gd` and `.tscn` are inside the same folder when first installing into your project. **!**
 
+See: [Youtube Installation Video](https://www.youtube.com/watch?v=Z00utD9bBzk)
+
 ## Usage
 All relevant settings are exported to godot to tweak within the editor.
 
