@@ -7,9 +7,14 @@ extends CharacterBody3D
 @export var IN_AIR_SPEED := 3.0
 @export var IN_AIR_ACCEL := 5.0
 @export var JUMP_VELOCITY := 4.5
+@export_subgroup("Head Bob")
+@export var HEAD_BOB := true
+@export var HEAD_BOB_FREQUENCY := 0.3
+@export var HEAD_BOB_AMPLITUDE := 0.01
 
 @export_category("Key Binds")
 @export_subgroup("Mouse")
+@export var MOUSE_ACCEL := true
 @export var KEY_BIND_MOUSE_SENS := 0.005
 @export var KEY_BIND_MOUSE_ACCEL := 50
 @export_subgroup("Movement")
@@ -18,6 +23,7 @@ extends CharacterBody3D
 @export var KEY_BIND_RIGHT := "ui_right"
 @export var KEY_BIND_DOWN := "ui_down"
 @export var KEY_BIND_JUMP := "ui_accept"
+
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
@@ -29,9 +35,26 @@ var accel = ACCEL
 var rotation_target_player : float
 var rotation_target_head : float
 
+# Used when bobing head
+var head_start_pos : Vector3
+
+# Current player tick, used in head bob calculation
+var tick = 0
+
+func _ready():
+	head_start_pos = $Head.position
+
 func _physics_process(delta):
+	# Increment player tick
+	tick += 1
+	
 	move_player(delta)
 	rotate_player(delta)
+	if HEAD_BOB:
+		# Only move head when on the floor and moving
+		if velocity && is_on_floor():
+			head_bob_motion()
+		reset_head_bob(delta)
 
 func _input(event):
 	# Listen for mouse movement and check if mouse is captured
@@ -45,11 +68,16 @@ func set_rotation_target(mouse_motion : Vector2):
 	rotation_target_head += -mouse_motion.y * KEY_BIND_MOUSE_SENS
 	
 func rotate_player(delta):
-	# Shperical lerp between player rotation and target
-	quaternion = quaternion.slerp(Quaternion(Vector3.UP, rotation_target_player), KEY_BIND_MOUSE_ACCEL * delta)
-	# Same again for head
-	$Head.quaternion = $Head.quaternion.slerp(Quaternion(Vector3.RIGHT, rotation_target_head), KEY_BIND_MOUSE_ACCEL * delta)
-
+	if MOUSE_ACCEL:
+		# Shperical lerp between player rotation and target
+		quaternion = quaternion.slerp(Quaternion(Vector3.UP, rotation_target_player), KEY_BIND_MOUSE_ACCEL * delta)
+		# Same again for head
+		$Head.quaternion = $Head.quaternion.slerp(Quaternion(Vector3.RIGHT, rotation_target_head), KEY_BIND_MOUSE_ACCEL * delta)
+	else:
+		# If mouse accel is turned off, simply set to target
+		quaternion = Quaternion(Vector3.UP, rotation_target_player)
+		$Head.quaternion = Quaternion(Vector3.RIGHT, rotation_target_head)
+	
 func move_player(delta):
 	# Check if not on floor
 	if not is_on_floor():
@@ -75,3 +103,15 @@ func move_player(delta):
 	velocity.z = move_toward(velocity.z, direction.z * speed, accel * delta)
 
 	move_and_slide()
+
+func head_bob_motion():
+	var pos = Vector3.ZERO
+	pos.y += sin(tick * HEAD_BOB_FREQUENCY) * HEAD_BOB_AMPLITUDE
+	pos.x += cos(tick * HEAD_BOB_FREQUENCY/2) * HEAD_BOB_AMPLITUDE * 2
+	$Head.position += pos
+
+func reset_head_bob(delta):
+	# Lerp back to the staring position
+	if $Head.position == head_start_pos:
+		pass
+	$Head.position = lerp($Head.position, head_start_pos, 2 * (1/HEAD_BOB_FREQUENCY) * delta)
