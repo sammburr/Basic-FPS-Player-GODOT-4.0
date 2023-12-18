@@ -1,4 +1,18 @@
+@tool
 extends CharacterBody3D
+
+var BasicFPSPlayerScene : PackedScene = preload("basic_player_head.tscn")
+var addedHead = false
+
+func _enter_tree():
+	if Engine.is_editor_hint() && !addedHead:
+		var s = BasicFPSPlayerScene.instantiate()
+		add_child(s)
+		s.owner = get_tree().edited_scene_root
+		addedHead = true
+
+## PLAYER MOVMENT SCRIPT ##
+###########################
 
 @export_category("Movement")
 @export_subgroup("Settings")
@@ -24,7 +38,6 @@ extends CharacterBody3D
 @export var KEY_BIND_DOWN := "ui_down"
 @export var KEY_BIND_JUMP := "ui_accept"
 
-
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 # To keep track of current speed and acceleration
@@ -42,9 +55,15 @@ var head_start_pos : Vector3
 var tick = 0
 
 func _ready():
+	if Engine.is_editor_hint():
+		return
+
 	head_start_pos = $Head.position
 
 func _physics_process(delta):
+	if Engine.is_editor_hint():
+		return
+	
 	# Increment player tick
 	tick += 1
 	
@@ -57,6 +76,9 @@ func _physics_process(delta):
 		reset_head_bob(delta)
 
 func _input(event):
+	if Engine.is_editor_hint():
+		return
+		
 	# Listen for mouse movement and check if mouse is captured
 	if event is InputEventMouseMotion && Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		set_rotation_target(event.relative)
