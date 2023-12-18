@@ -1,3 +1,5 @@
+![](https://github.com/sammburr/Basic-FPS-Player-GODOT-4.0/blob/4929a04b2791b13184eea82ead9caaf57894be48/addons/Basic%20FPS%20Player/Assets/Basic%20FPS%20Player.png)
+
 # Basic-FPS-Player-GODOT-4.0
 (`GDScript`) Godot 4.0 *very* basic FPS player controller with mouse and keyboard input for a kick start in your fps project.
 
