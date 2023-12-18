@@ -14,6 +14,9 @@ func _enter_tree():
 ## PLAYER MOVMENT SCRIPT ##
 ###########################
 
+@export_category("Mouse Capture")
+@export var CAPTURE_ON_START := true
+
 @export_category("Movement")
 @export_subgroup("Settings")
 @export var SPEED := 5.0
@@ -57,6 +60,10 @@ var tick = 0
 func _ready():
 	if Engine.is_editor_hint():
 		return
+
+	# Capture mouse if set to true
+	if CAPTURE_ON_START:
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 	head_start_pos = $Head.position
 
