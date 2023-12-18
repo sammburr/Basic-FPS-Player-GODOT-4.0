@@ -2,6 +2,11 @@
 
 # Basic-FPS-Player-GODOT-4.0
 (`GDScript`) Godot 4.0 *very* basic FPS player controller with mouse and keyboard input for a kick start in your fps project.
+Current version **V1.2**
+- Basic walk + jump
+- Head bob
+- Mouse acceleration + smoothing
+- Easy action rebinding
 
 ## Installation
 See: [Youtube Installation Video](https://www.youtube.com/watch?v=-yS7S-bYY3s)
