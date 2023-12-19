@@ -5,6 +5,10 @@ var BasicFPSPlayerScene : PackedScene = preload("basic_player_head.tscn")
 var addedHead = false
 
 func _enter_tree():
+	
+	if find_child("Head"):
+		addedHead = true
+	
 	if Engine.is_editor_hint() && !addedHead:
 		var s = BasicFPSPlayerScene.instantiate()
 		add_child(s)
@@ -28,6 +32,10 @@ func _enter_tree():
 @export var HEAD_BOB := true
 @export var HEAD_BOB_FREQUENCY := 0.3
 @export var HEAD_BOB_AMPLITUDE := 0.01
+@export_subgroup("Clamp Head Rotation")
+@export var CLAMP_HEAD_ROTATION := true
+@export var CLAMP_HEAD_ROTATION_MIN := -90.0
+@export var CLAMP_HEAD_ROTATION_MAX := 90.0
 
 @export_category("Key Binds")
 @export_subgroup("Mouse")
@@ -40,6 +48,10 @@ func _enter_tree():
 @export var KEY_BIND_RIGHT := "ui_right"
 @export var KEY_BIND_DOWN := "ui_down"
 @export var KEY_BIND_JUMP := "ui_accept"
+
+@export_category("Advanced")
+@export var UPDATE_PLAYER_ON_PHYS_STEP := true	# When check player is moved and rotated in _physics_process (fixed fps)
+												# Otherwise player is updated in _process (uncapped)
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
@@ -71,16 +83,26 @@ func _physics_process(delta):
 	if Engine.is_editor_hint():
 		return
 	
-	# Increment player tick
+	# Increment player tick, used in head bob motion
 	tick += 1
 	
-	move_player(delta)
-	rotate_player(delta)
+	if UPDATE_PLAYER_ON_PHYS_STEP:
+		move_player(delta)
+		rotate_player(delta)
+	
 	if HEAD_BOB:
 		# Only move head when on the floor and moving
 		if velocity && is_on_floor():
 			head_bob_motion()
 		reset_head_bob(delta)
+
+func _process(delta):
+	if Engine.is_editor_hint():
+		return
+
+	if !UPDATE_PLAYER_ON_PHYS_STEP:
+		move_player(delta)
+		rotate_player(delta)
 
 func _input(event):
 	if Engine.is_editor_hint():
@@ -95,6 +117,9 @@ func set_rotation_target(mouse_motion : Vector2):
 	rotation_target_player += -mouse_motion.x * KEY_BIND_MOUSE_SENS
 	# Add head target to the mouse -y input
 	rotation_target_head += -mouse_motion.y * KEY_BIND_MOUSE_SENS
+	# Clamp rotation
+	if CLAMP_HEAD_ROTATION:
+		rotation_target_head = clamp(rotation_target_head, deg_to_rad(CLAMP_HEAD_ROTATION_MIN), deg_to_rad(CLAMP_HEAD_ROTATION_MAX))
 	
 func rotate_player(delta):
 	if MOUSE_ACCEL:
